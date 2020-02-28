@@ -147,7 +147,7 @@ function find_or_create_user_from_saml(req, res) {
           id: user.id,
           username: user.username,
           email: user.email,
-          image: image,
+          image,
           change_password: user.date_password,
           starters_tour_ended: user.starters_tour_ended,
         };
