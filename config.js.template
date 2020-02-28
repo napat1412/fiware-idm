@@ -82,6 +82,10 @@ config.authorization = {
         enabled: to_boolean(process.env.IDM_AUTHZFORCE_ENABLED, false),
         host: (process.env.IDM_AUTHZFORCE_HOST || 'localhost'),
         port: (process.env.IDM_AUTHZFORCE_PORT||  8080),
+        auth: {
+            key: (process.env.IDM_AUTHZFORCE_AUTH_KEY || 'X-Auth-Token'),
+            value: (process.env.IDM_AUTHZFORCE_AUTH_VALUE || 'test'),
+        }
     }
 }
 

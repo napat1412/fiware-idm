@@ -11,6 +11,8 @@ const gravatar = require('gravatar');
 const image = require('../../lib/image.js');
 const crypto = require('crypto');
 
+const authzforce = require('../../lib/authzforce.js');
+
 // Autoload info if path include application_id
 exports.load_application = function(req, res, next, application_id) {
   debug('--> load_application');
@@ -707,26 +709,55 @@ exports.delete_avatar = function(req, res) {
 exports.destroy = function(req, res) {
   debug('--> destroy');
 
-  // Destroy application with specific id
-  models.oauth_client
-    .destroy({
-      where: { id: req.application.id },
+  // Find az_domian of application and delete az_domain.
+  models.authzforce
+    .findOne({
+      where: { oauth_client_id: req.application.id },
     })
-    .then(function() {
-      // If the image is not the default one, delete image from filesystem
-      if (req.application.image.includes('/img/applications')) {
-        const image_name = req.application.image.split('/')[3];
-        fs.unlink('./public/img/applications/' + image_name);
+    .then(function(domain) {
+      if (domain) {
+        authzforce.destroy_application_domain(domain)
+          .then(function() {
+            debug('Authzforce domain of application deleted');
+          })
+          .catch(function(error) {
+            debug('Error: ', error);
+            req.session.message = {
+              text: ' Connection to Authzforce server error.',
+              type: 'warning',
+            };
+          })
       }
-      // Send message of success in deleting application
-      req.session.message = { text: ' Application deleted.', type: 'success' };
-      res.redirect('/idm/applications');
+
+      // Destroy application with specific id
+      models.oauth_client
+        .destroy({
+          where: { id: req.application.id },
+        })
+        .then(function() {
+          // If the image is not the default one, delete image from filesystem
+          if (req.application.image.includes('/img/applications')) {
+            const image_name = req.application.image.split('/')[3];
+            fs.unlink('./public/img/applications/' + image_name);
+          }
+          // Send message of success in deleting application
+          req.session.message = { text: ' Application deleted.', type: 'success' };
+          res.redirect('/idm/applications');
+        })
+        .catch(function(error) {
+          debug('Error: ', error);
+          // Send message of fail when deleting application
+          req.session.message = {
+            text: ' Application delete error.',
+            type: 'warning',
+          };
+          res.redirect('/idm/applications');
+        });
     })
     .catch(function(error) {
       debug('Error: ', error);
-      // Send message of fail when deleting application
       req.session.message = {
-        text: ' Application delete error.',
+        text: ' Authzforce models error.',
         type: 'warning',
       };
       res.redirect('/idm/applications');

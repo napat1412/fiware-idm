@@ -2,6 +2,7 @@ branches:
   only:
     - master
     - sso-saml
+    - sso-saml_authzforce
     
 addons:
   apt:
