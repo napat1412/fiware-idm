@@ -125,6 +125,7 @@ function check_user_action(application, path, method, permissions) {
       }
       break;
     case path.includes('edit') ||
+      path.includes('credential') ||
       path.includes('iot') ||
       path.includes('pep') ||
       path.includes('token_types'):

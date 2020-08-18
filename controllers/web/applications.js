@@ -179,10 +179,31 @@ exports.show = function(req, res) {
     attributes: ['id'],
   });
 
-  Promise.all([search_iots, search_pep])
+  // Search credentials of application
+  const search_credentials = models.oauth_access_token.findAll({
+    where: { oauth_client_id: req.application.id, scope: 'credential' },
+    attributes: ['refresh_token', 'user_id', 'expires'],
+  })
+  .then(function(result) {
+    let credentials = [];
+    if (result.length > 0) {
+      for (var i = 0; i < result.length; i++) {
+        credentials.push({
+          id: result[i].refresh_token,
+          user_id: result[i].user_id,
+          expires: result[i].expires,
+        });
+      }
+    }
+    console.log(JSON.stringify(credentials));
+    return credentials;
+  });
+  
+  Promise.all([search_iots, search_pep, search_credentials])
     .then(function(values) {
       const iot_sensors = values[0];
       const pep_proxy = values[1];
+      const credentials = values[2];
 
       // Send message if error exists
       if (req.session.message) {
@@ -195,6 +216,7 @@ exports.show = function(req, res) {
         user_logged_permissions: req.user_owned_permissions,
         pep_proxy,
         iot_sensors,
+        credentials,
         eidas_enabled: config.eidas.enabled,
         eidas_credentials: req.eidas_credentials,
         gateway_host: config.eidas.gateway_host,

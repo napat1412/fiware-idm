@@ -23,6 +23,7 @@ const web_perm_controller = index_controller.permissions;
 const web_usage_policies_controller = index_controller.usage_policies;
 const web_ptp_controller = index_controller.ptps;
 const web_peppx_controller = index_controller.pep_proxies;
+const web_credential_controller = index_controller.credentials;
 const web_iota_controller = index_controller.iot_agents;
 const saml2_controller = require('../../controllers/saml2/saml2');
 
@@ -273,6 +274,20 @@ if (config.usage_control.enabled) {
   // POST PREVIOUS JOB ID
   router.post('/:application_id/job_id', web_ptp_controller.create_job_id);
 }
+
+// Routes to handle credential of applications
+router.post(
+  '/:application_id/credential/register',
+  web_check_perm_controller.owned_permissions,
+  csrf_protection,
+  web_credential_controller.register_credential
+);
+router.delete(
+  '/:application_id/credential/:credential_id/delete',
+  web_check_perm_controller.owned_permissions,
+  csrf_protection,
+  web_credential_controller.delete_credential
+);
 
 // Routes to handle iot of applications
 router.get(

@@ -14,6 +14,7 @@ module.exports = {
   usage_policies: require('../../controllers/web/usage_policies'),
   ptps: require('../../controllers/web/ptps'),
   pep_proxies: require('../../controllers/web/pep_proxies'),
+  credentials: require('../../controllers/web/credentials'),
   iot_agents: require('../../controllers/web/iot_agents'),
   users: require('../../controllers/web/users'),
   organizations: require('../../controllers/web/organizations'),
