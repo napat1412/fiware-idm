@@ -734,7 +734,7 @@
       "popover04_title": "IoT Sensors",
       "popover05_body": "You can copy this OIC credential into your application in order to validate a JWT generated using an OIC flow.",
       "popover05_title": "Open ID Connect Credentials",
-      "popover06_body": "If your application is related to IoT, IoT need credentials for autorization.",
+      "popover06_body": "If your application is related to IoT, IoT need credentials for authorization.",
       "popover06_title": "Credentials",
       "reset_secret_btn": "Reset secret",
       "register_pep_btn": "Register a new PEP Proxy",

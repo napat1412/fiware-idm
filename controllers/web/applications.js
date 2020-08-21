@@ -182,20 +182,25 @@ exports.show = function(req, res) {
   // Search credentials of application
   const search_credentials = models.oauth_access_token.findAll({
     where: { oauth_client_id: req.application.id, scope: 'credential' },
-    attributes: ['refresh_token', 'user_id', 'expires'],
+    attributes: ['refresh_token', 'user_id', 'expires', 'extra'],
+    include: [
+      {
+        model: models.user,
+        attributes: ['username'],
+      },
+    ],
   })
   .then(function(result) {
     let credentials = [];
     if (result.length > 0) {
       for (var i = 0; i < result.length; i++) {
         credentials.push({
-          id: result[i].refresh_token,
-          user_id: result[i].user_id,
+          id: result[i].extra.id,
+          user_role: result[i].User.username,
           expires: result[i].expires,
         });
       }
     }
-    console.log(JSON.stringify(credentials));
     return credentials;
   });
   

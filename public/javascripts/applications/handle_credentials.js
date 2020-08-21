@@ -48,7 +48,7 @@ $(document).ready(function() {
               .remove();
             var credential = $('#credential_template').html();
             credential = credential.replace(/credential_id/g, result.credential.id);
-            credential = credential.replace(/credential_role/g, result.credential.role);
+            credential = credential.replace(/credential_user_role/g, result.credential.user_role);
             //credential = credential.replace(/credential_expires/g, result.credential.expires);
             credential = credential.replace(/credential_token/g, result.credential.access_token);
             credential = credential.replace(/application_id/g, application_id);

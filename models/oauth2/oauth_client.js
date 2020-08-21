@@ -1,4 +1,5 @@
 const config_oauth2 = require('../../config.js').oauth2;
+const uuid = require('uuid');
 
 // BD to store all applicationes with their feautures
 module.exports = function(sequelize, DataTypes) {
@@ -7,7 +8,8 @@ module.exports = function(sequelize, DataTypes) {
     {
       id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        //defaultValue: DataTypes.UUIDV4,
+        defaultValue: uuid.v4().replace(/-/g, '_'),
         primaryKey: true,
       },
       name: {
@@ -28,7 +30,8 @@ module.exports = function(sequelize, DataTypes) {
       },
       secret: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        //defaultValue: DataTypes.UUIDV4,
+        defaultValue: uuid.v4().replace(/-/g, '_'),
       },
       url: {
         type:
