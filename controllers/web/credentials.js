@@ -73,21 +73,13 @@ exports.delete_credential = function(req, res) {
   // Destroy credential form table
   models.oauth_access_token
     .destroy({
-      where:
-        Sequelize.where(
-          Sequelize.fn('JSON_EXTRACT',
-            Sequelize.col('extra'),
-            '$.id'),
-          req.params.credential_id)
-    })
-  /*models.oauth_access_token
-    .destroy({
-      where: {
-        //refresh_token: 'credential_87768c230bf73147698086a06c93c8b5b90bb21e',
-        refresh_token: req.params.credential_id,
+      where: {    
         oauth_client_id: req.application.id,
-      },
-    })*/
+        extra: Sequelize.where(
+          Sequelize.fn('JSON_EXTRACT', Sequelize.col('extra'),'$.id'),
+          req.params.credential_id)
+      }
+    })
     .then(function(deleted) {
       let response;
 
