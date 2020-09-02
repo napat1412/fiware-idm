@@ -146,11 +146,13 @@ exports.create = function(req, res) {
   // Build a row and validate if input values are correct (not empty) before saving values in oauth_client
   check_create_body_request(req.body)
     .then(function(oauth_type) {
-      const application = models.oauth_client.build(req.body.application);
+      let application_detail = Object.assign({}, req.body.application);
+      application_detail.id = uuid.v4().replace(/-/g, '_');
+      application_detail.secret = uuid.v4().replace(/-/g, '_');
 
-      application.image = 'default';
-      application.id = uuid.v4();
-      application.secret = uuid.v4();
+      // Build a row and validate if input values are correct (not empty) before saving values in oauth_client
+      const application = models.oauth_client.build(application_detail);
+
       if (oauth_type.grant_type.length > 0) {
         application.grant_type = oauth_type.grant_type;
         application.response_type = oauth_type.response_type;

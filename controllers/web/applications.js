@@ -1,5 +1,6 @@
 const models = require('../../models/models.js');
 const fs = require('fs');
+const uuid = require('uuid');
 const _ = require('lodash');
 
 const config = require('../../config');
@@ -398,9 +399,13 @@ exports.create = function(req, res, next) {
     };
     return res.redirect('/idm/applications');
   }
+ 
+  let application_detail = Object.assign({}, req.body.application);
+  application_detail.id = uuid.v4().replace(/-/g, '_');
+  application_detail.secret = uuid.v4().replace(/-/g, '_');
 
   // Build a row and validate if input values are correct (not empty) before saving values in oauth_client
-  const application = models.oauth_client.build(req.body.application);
+  const application = models.oauth_client.build(application_detail);
 
   application.grant_type = req.body.grant_type ? req.body.grant_type : [''];
 
