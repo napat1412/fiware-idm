@@ -1,0 +1,86 @@
+#ARG NODE_VERSION=10.17.0-slim
+#FROM node:${NODE_VERSION}
+FROM node:12.14.1-stretch
+#FROM node:12.19.0-alpine3.12
+
+ENV IDM_HOST="http://localhost:3000" \
+    IDM_PORT="3000" \
+    IDM_PDP_LEVEL="basic" \
+    IDM_DB_HOST="localhost" \
+    IDM_DB_NAME="idm" \
+    IDM_DB_DIALECT="mysql" \
+    IDM_EMAIL_HOST="localhost" \
+    IDM_EMAIL_PORT="25" \
+    IDM_EMAIL_ADDRESS="noreply@localhost"
+
+# IMPORTANT: For a Production Environment Use Docker Secrets to define
+#  these values and add _FILE to the name of the variable.
+
+# Install Ubuntu dependencies & email dependency & Configure mail
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential python debconf-utils curl git netcat  && \
+    echo "postfix postfix/mailname string ${IDM_EMAIL_ADDRESS}" | debconf-set-selections && \
+    echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
+    apt-get install -y --no-install-recommends postfix mailutils && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    sed -i 's/inet_interfaces = all/inet_interfaces = loopback-only/g' /etc/postfix/main.cf
+
+
+#
+# The following line retrieves the latest source code from GitHub.
+#
+# To obtain the latest stable release run this Docker file with the parameters
+# --no-cache --build-arg DOWNLOAD_TYPE=stable
+#
+# Alternatively for local development, just copy this Dockerfile into file the
+# root of the repository and copy over your local source using :
+#
+#COPY . /opt/fiware-idm
+#
+#RUN if [ ${DOWNLOAD_TYPE} = "latest" ] ; then RELEASE="master"; else RELEASE=$(curl -s https://api.github.com/repos/${GITHUB_ACCOUNT}/${GITHUB_REPOSITORY}/releases/latest | grep 'tag_name' | cut -d\" -f4); fi && \
+#    if [ ${DOWNLOAD_TYPE} = "latest" ] ; then echo "INFO: Building Latest Development"; else echo "INFO: Building Release: ${RELEASE}"; fi && \
+#    apt-get update && \
+#    apt-get install -y  --no-install-recommends unzip && \
+#    wget --no-check-certificate -O source.zip https://github.com/${GITHUB_ACCOUNT}/${GITHUB_REPOSITORY}/archive/${RELEASE}.zip && \
+#    unzip source.zip && \
+#    mv ${GITHUB_REPOSITORY}-${RELEASE} /opt/fiware-idm && \
+#    apt-get clean && \
+#    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+WORKDIR /opt/fiware-idm
+
+RUN mkdir certs && \
+    openssl genrsa -out idm-2018-key.pem 2048 && \
+    openssl req -new -sha256 -key idm-2018-key.pem -out idm-2018-csr.pem -batch && \
+    openssl x509 -req -in idm-2018-csr.pem -signkey idm-2018-key.pem -out idm-2018-cert.pem && \
+    mv idm-2018-key.pem idm-2018-cert.pem idm-2018-csr.pem certs/
+
+
+# For local development, when running the Dockerfile from the root of the repository
+# use the following commands to configure Keyrock, the database and add an entrypoint:
+#
+COPY package*.json ./
+
+COPY . .
+COPY config.js.template  config.js
+COPY extras/docker/config_database.js  extras/docker/config_database.js
+COPY extras/docker/docker-entrypoint.sh /opt/fiware-idm/docker-entrypoint.sh
+
+### IF, you comment npm install, you need to remove node_modules for .dockerignore
+#RUN npm install
+
+
+# Copy config database file
+#COPY config_database.js extras/docker/config_database.js
+# Copy config file
+#COPY config.js.template config.js
+
+# Run Idm Keyrock
+#COPY docker-entrypoint.sh /opt/fiware-idm/docker-entrypoint.sh
+RUN chmod 755 docker-entrypoint.sh
+
+ENTRYPOINT ["/opt/fiware-idm/docker-entrypoint.sh"]
+
+# Ports used by idm
+EXPOSE ${IDM_PORT}
