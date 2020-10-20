@@ -3,6 +3,7 @@ const create_oauth_response = require('../../models/model_oauth_server.js')
   .create_oauth_response;
 const config_eidas = require('../../config.js').eidas;
 const config_oauth2 = require('../../config.js').oauth2;
+const config_external_user_sso = require('../../config.js').external_user_sso;
 const user_controller = require('../../controllers/web/users');
 const OauthServer = require('oauth2-server'); //eslint-disable-line snakecase/snakecase
 const gravatar = require('gravatar');
@@ -151,6 +152,8 @@ exports.check_user = function(req, res, next) {
         req.saml_auth_request.redirectLocationUrl;
       render_values.saml_request.enabled = true;
     }
+
+    render_values.sso_enabled = config_external_user_sso.enabled;
 
     res.render('oauth/index', render_values);
   }

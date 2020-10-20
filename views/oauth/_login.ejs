@@ -52,6 +52,9 @@
           </span>
         </label>
       </div>
+      <% if ((typeof sso_enabled !== 'undefined') && (sso_enabled)) { %>
+        <a href="/auth/sso/login" class="btn btn-primary"><%=translation.auth.login.loginin_sso_btn%></a>
+      <% } %>
       <button type="submit" class="btn btn-primary pull-right"><%=translation.oauth.login.loginin_btn%></button>
       <% if (saml_request.enabled) { -%>
         <button id="saml2_eidas_button" type="submit"  class="btn btn-primary pull-right second_submit_button" formaction="/saml2/login?response_type=<%= application.response_type %>&client_id=<%= application.id %>&state=<%= application.state %>&redirect_uri=<%= application.redirect_uri %>" ><%=translation.oauth.login.eidas_loginin_btn%></button>
