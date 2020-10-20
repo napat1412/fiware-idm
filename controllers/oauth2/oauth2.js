@@ -82,7 +82,7 @@ exports.response_type_required = function(req, res, next) {
 // MW to search application
 exports.load_application = function(req, res, next) {
   debug(' --> load_application');
-
+  
   models.oauth_client
     .findOne({
       where: { id: req.query.client_id },

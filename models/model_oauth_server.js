@@ -888,22 +888,17 @@ function app_authzforce_domain(app_id) {
 
 function validateScope(user, client, scope) {
   debug('-------validateScope-------');
-
-  if (scope) {
-    const requested_scopes = scope.split(',');
-    if (
-      requested_scopes.includes('bearer') &&
-      requested_scopes.includes('jwt')
-    ) {
+  console.log(scope);
+  if (scope && scope.length > 0) {
+    const requested_scopes = scope[0].split(',');
+    if (requested_scopes.includes('bearer') && requested_scopes.includes('jwt')) {
       return false;
     }
-    if (
-      requested_scopes.includes('permanent') ||
-      requested_scopes.includes('jwt')
-    ) {
-      return requested_scopes.every(r => client.token_types.includes(r))
-        ? requested_scopes
-        : false;
+    if (requested_scopes.includes('permanent') || requested_scopes.includes('jwt')) {
+      return requested_scopes.every((r) => client.token_types.includes(r)) ? requested_scopes : false;
+    }
+    if (requested_scopes.includes('openid')) {
+      return client.scope.includes('openid') ? requested_scopes : false;
     }
     return requested_scopes;
   }

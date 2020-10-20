@@ -1,6 +1,8 @@
 #ARG NODE_VERSION=10.17.0-slim
 #FROM node:${NODE_VERSION}
-FROM node:10.17.0-slim
+#FROM node:10.17.0-slim
+FROM node:12.14.1-slim
+#FROM node:12.14.1-stretch
 ARG GITHUB_ACCOUNT=ging
 ARG GITHUB_REPOSITORY=fiware-idm
 ARG DOWNLOAD_TYPE=latest
@@ -111,6 +113,7 @@ ENV IDM_HOST="http://localhost:3000" \
 
 # Install Ubuntu dependencies & email dependency & Configure mail
 RUN apt-get update && \
+    apt-get install -y ca-certificates && \
     apt-get install -y --no-install-recommends build-essential python debconf-utils curl git netcat  && \
     echo "postfix postfix/mailname string ${IDM_EMAIL_ADDRESS}" | debconf-set-selections && \
     echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
@@ -144,8 +147,8 @@ COPY . /opt/fiware-idm
 WORKDIR /opt/fiware-idm
 
 RUN rm -rf doc extras  && \
-    npm cache clean -f   && \
-    npm install --production  && \
+    npm cache clean -f  && \
+    npm install --production && \
     rm -rf /root/.npm/cache/* && \
     mkdir certs && \
     openssl genrsa -out idm-2018-key.pem 2048 && \

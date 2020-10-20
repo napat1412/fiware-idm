@@ -194,7 +194,7 @@ exports.show = function(req, res) {
   .then(function(result) {
     let credentials = [];
     if (result.length > 0) {
-      for (var i = 0; i < result.length; i++) {
+      for (let i = 0; i < result.length; i++) {
         credentials.push({
           id: result[i].extra.id,
           user_role: result[i].User.username,
